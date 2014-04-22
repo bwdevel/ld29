@@ -1,4 +1,5 @@
-require "states/states.lua";
+require "states/states";
+require "states/menu";
 
 function love.load()
 	statesLoad()
