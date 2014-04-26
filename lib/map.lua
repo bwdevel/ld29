@@ -8,8 +8,8 @@ function mapgen(width, height)
 --	local highClamp = height - math.floor(height/3)
 		--local lowClamp = math.floor(height/3)
 --	local lowClamp = highClamp - 10
-	local p = height - (math.floor(love.window.getHeight()/xScale)/height)
-	local p = math.floor(vheight/2)
+	--local p = height - (math.floor(love.window.getHeight()/xScale)/height)
+	local p = math.floor(vheight/2) --- make this dynamic
 
 	print("height: " .. height .. "  vheight: " .. vheight .. "   p init: " .. p)
 	--local p = math.floor(love.window.getHeight()/textureSize)/2
@@ -33,7 +33,8 @@ function mapgen(width, height)
 			elseif y > height - 4 then
 				container[x][y]["tile"] = 12
 			else
-				container[x][y]["tile"] = getType()
+				--(height -4) - (p+5)
+				container[x][y]["tile"] = getType( math.floor( (y / mapHeight) * 100) )
 			end
 		end
 
@@ -96,9 +97,11 @@ function modPosition(height, p, v, a)
 end
 
 function mapdraw(ox,oy)
+	local tempX = math.floor(ox/textureSize)
+	local tempY = math.floor(oy/textureSize)
 
 
-	for x = 0, mapWidth-1 do
+	for x = 0 , mapWidth-1 do
 		for y = 0, mapHeight-1 do
 			if (x >= mapX1 and x <= mapX2) and (y >= mapY1 and y <= mapY2) then
 				love.graphics.draw(tile[grid[x][y]["tile"]],(x*textureSize) + ox, (y*textureSize) +  oy)
@@ -112,17 +115,73 @@ function mapdraw(ox,oy)
 		end
 	end
 
+--	for x = 0 - tempX , mapWidth - 1 - tempX do
+--		local xx = x
+--		if xx >= mapWidth then xx = xx - mapWidth end
+--		if xx < 0 then xx = xx + mapWidth end
+
+--		for y = 0 - tempY, mapHeight - 1 - tempY do
+--			local yy = y
+--			if yy >= mapHeight then yy = yy - mapHeight end
+--			if yy < 0 then yy = yy + mapHeight end
+
+--			love.graphics.draw(tile[grid[xx][yy]["tile"]],(xx*textureSize) + ox, (yy*textureSize) +  oy)
+--				local light = grid[x][y]["light"]
+--				if light ~= 255 then
+--					love.graphics.setColor( 0, 0, 0, light)
+--					love.graphics.rectangle("fill", (x*textureSize) + ox, (y*textureSize) +  oy, textureSize, textureSize)
+--					love.graphics.setColor( 255, 255, 255, 255)
+--				end
+
+	local text = "tempX: " .. tempX .. "    tempY: " .. tempY
+	love.graphics.print(text, 10, 46)
 end
 
-function getType()
-	local ttype = 1
-		local rand = math.random(1, 1000)
-		if rand == 5 then ttype =  7
-		elseif rand > 5 and rand <= 20 then ttype = 7
-		elseif rand > 20 and rand <=65 then ttype = 6
-		elseif rand > 65 and rand <=95 then ttype = 5
-		elseif rand > 95 and rand <= 150 then ttype = 4
+function getType(depth)
+	local rand = math.random(1, 100)
+	local ttype = 1  -- stone
+
+	if depth <= 40 then
+		if rand <= 4 then 
+			ttype = 5				-- iron
+		elseif rand <= 12 
+			then ttype = 4  -- coal
+		elseif rand <= 14
+			then ttype = 6 	-- iron
+		end
+	elseif 	depth <= 70 then
+		if rand <= 2 then 
+			ttype = 7 			-- emeralds
+		elseif rand <= 9 
+			then ttype = 5 	-- iron
+		elseif rand <= 16
+			then ttype = 4 	-- coal
+		end
+	else 
+		if rand <= 2 then 
+			ttype = 8 			-- diamonds
+		elseif rand <= 8 
+			then ttype = 6 	-- gold
+		elseif rand <= 12
+			then ttype = 5	-- iron
+		elseif rand <= 14
+			then ttype = 7 	-- emerald
+		elseif rand <= 16
+			then ttype = 4  -- coal
+		end
+
 	end
+--	local ttype = 1
+
+
+
+--	local rand = math.random(1, 1000)
+--	if rand == 5 then ttype =  7
+--	elseif rand > 5 and rand <= 20 then ttype = 7
+--	elseif rand > 20 and rand <=65 then ttype = 6
+--	elseif rand > 65 and rand <=95 then ttype = 5
+--	elseif rand > 95 and rand <= 150 then ttype = 4
+--end
 
 	return ttype
 end

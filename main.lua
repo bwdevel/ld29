@@ -8,14 +8,16 @@ function love.load()
 	scrollRight = false
 	scrollDown = false
 	scrollUp = false
-	scrollSpeed = 3
+	scrollSpeed = 5
 	skyAlpha = 255
 	timeofday = 43200
 	timescale = 10000
 	statesLoad()
-	textureSize = 16
-	mapWidth = (love.window.getWidth()/textureSize)*2
-	mapHeight = (love.window.getHeight()/textureSize)*2
+	textureSize = 32
+	mapScaleX = 4
+	mapScaleY = 3
+	mapWidth = (love.window.getWidth() / textureSize) * mapScaleX
+	mapHeight = (love.window.getHeight() / textureSize) * mapScaleY
 	mapOffsetX = 0
 	mapOffsetY = 0
 	mapX1 = 0
@@ -25,6 +27,7 @@ function love.load()
 
 	grid = mapgen(mapWidth, mapHeight)
 	love.graphics.setBackgroundColor( 0, 0, 0, 255 ) -- sky color
+	print("mapWidth: " .. mapWidth .. "    mapHeight:  " .. mapHeight .. "    mapOffsetX (cap): " .. (mapWidth * textureSize) - love.window.getWidth())
 end
 
 function love.update(dt)
@@ -40,6 +43,11 @@ function love.update(dt)
 	if scrollRight then mapOffsetX = mapOffsetX - scrollSpeed end
 	if scrollUp then mapOffsetY = mapOffsetY + scrollSpeed end
 	if scrollDown then mapOffsetY = mapOffsetY - scrollSpeed end
+
+	if mapOffsetX > 0 then mapOffsetX = 0 end
+  if mapOffsetX <  love.window.getWidth()- (mapWidth * textureSize) then mapOffsetX = love.window.getWidth()- (mapWidth * textureSize) end
+	if mapOffsetY > 0 then mapOffsetY = 0 end
+  if mapOffsetY <  love.window.getHeight()- (mapHeight * textureSize) then mapOffsetY = love.window.getHeight()- (mapHeight * textureSize) end
 
 	mapX1 = -math.floor(mapOffsetX/textureSize)-1
 	mapX2 = mapX1 + love.window.getWidth()/textureSize
@@ -59,10 +67,10 @@ function love.draw()
 
 	mapdraw(mapOffsetX, mapOffsetY)
 	
-	love.graphics.print(timeofday, 10, 20)
-	local text = "mapX1: " .. mapX1 .. "   mapX2: " .. mapX2 .. "   mapY1: " .. mapY1 .. "  mapY2: " .. mapY2
-	love.graphics.print(text, 10, 30)
-	love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 40)
+	love.graphics.print(timeofday, 10, 22)
+	local text = "mapX1: " .. mapX1 .. "   mapX2: " .. mapX2 .. "   mapY1: " .. mapY1 .. "  mapY2: " .. mapY2 .. "   mapOffsetX: " .. mapOffsetX
+	love.graphics.print(text, 10, 34)
+	love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 58)
 
 
 end
