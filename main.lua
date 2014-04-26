@@ -1,7 +1,8 @@
+require "assets/assets";
 require "states/states";
 require "states/menu";
 require "lib/map";
-require "assets/assets";
+require "player";
 
 function love.load()
 	scrollLeft = false
@@ -54,7 +55,7 @@ function love.update(dt)
 	mapY1 = -math.floor(mapOffsetY/textureSize)-1
 	mapY2 = mapY1 + love.window.getHeight()/textureSize
 
-
+	playerUpdate()
 end
 
 function love.draw()
@@ -66,7 +67,10 @@ function love.draw()
 	statesDraw()
 
 	mapdraw(mapOffsetX, mapOffsetY)
+	drawPlayer()
+
 	
+	-- debug
 	love.graphics.print(timeofday, 10, 22)
 	local text = "mapX1: " .. mapX1 .. "   mapX2: " .. mapX2 .. "   mapY1: " .. mapY1 .. "  mapY2: " .. mapY2 .. "   mapOffsetX: " .. mapOffsetX
 	love.graphics.print(text, 10, 34)
@@ -102,7 +106,10 @@ function love.keyreleased(key)
 
 	statesKeyReleased(key)
 	if key == 'q' then love.event.quit() end
-	if key == ' ' then grid = mapgen(mapWidth, mapHeight) end
+	if key == ' ' then 
+		grid = mapgen(mapWidth, mapHeight) 
+		findGround() 
+	end
 
 	if key == 'a' or key == 'left' then scrollRight = false end
 	if key == 'd' or key == 'right' then scrollLeft = false end

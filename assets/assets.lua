@@ -25,3 +25,6 @@ tile[10] = love.graphics.newImage("assets/textures/leaves_oak.png")
 tile[11] = love.graphics.newImage("assets/textures/ice.png")
 --bedrock
 tile[12] = love.graphics.newImage("assets/textures/bedrock.png")
+
+playerSprite = love.graphics.newImage("assets/player.png")
+

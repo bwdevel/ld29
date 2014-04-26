@@ -22,39 +22,47 @@ function mapgen(width, height)
 	local container = initTable(width, height)
 
 	for x = 0, width - 1 do
-		--container[x][height-p] = 3
-		container[x][p]["tile"] = 3
-
---		for y = height-p+1, height -1 do
+		--mostly grass but some random dirt
+		if math.random(1,100) <= 5 then 		
+			container[x][p]["tile"] = 2 -- dirt
+		else
+			container[x][p]["tile"] = 3 -- grass
+		end
 		for y = p+1, height -1 do
---			if y < height-p+5 then
 			if y < p+5 then
-					container[x][y]["tile"] = 2
+				-- mostly dirt, but some random stone
+				if math.random(1,100) <= 5 then 		
+					container[x][y]["tile"] = 1 -- stone
+				else
+					container[x][y]["tile"] = 2 -- dirt
+				end
 			elseif y > height - 4 then
 				container[x][y]["tile"] = 12
 			else
-				--(height -4) - (p+5)
 				container[x][y]["tile"] = getType( math.floor( (y / mapHeight) * 100) )
 			end
 		end
 
-		p = p+v
-		if p > highClamp then 
-			p = highClamp 
-			v = 0
-			a = -math.abs(a)
+		-- flatten terrain a bit
+		if math.random(1,2) == 2 then
+			p = p+v
+			if p > highClamp then 
+				p = highClamp 
+				v = 0
+				a = -math.abs(a)
+			end
+			if p < lowClamp then 
+				p = lowClamp 
+				v=0 
+				a = math.abs(a)
+			end
+			v = v+a
+			a = math.random(-2, 2)
 		end
-		if p < lowClamp then 
-			p = lowClamp 
-			v=0 
-			a = math.abs(a)
-		end
-
-		v = v+a
-		a = math.random(-2, 2)
 	end
 
 	print("highClamp: " .. highClamp .. "   lowClamp: " .. lowClamp .. "   xScale: " .. xScale)
+
 
 	--print(tostring(container))
 	return container
