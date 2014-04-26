@@ -1,29 +1,43 @@
 
 function mapgen(width, height)
-	local highClamp = height - math.floor(height/3)
-	local lowClamp = math.floor(height/3)
-	local p = math.floor(height/2)
+	mapOffsetX = 0
+	mapOffsetY = 0
+	vheight = math.floor(love.window.getHeight()/textureSize)
+
+	local xScale = (height*textureSize)/love.window.getHeight()
+--	local highClamp = height - math.floor(height/3)
+		--local lowClamp = math.floor(height/3)
+--	local lowClamp = highClamp - 10
+	local p = height - (math.floor(love.window.getHeight()/xScale)/height)
+	local p = math.floor(vheight/2)
+
+	print("height: " .. height .. "  vheight: " .. vheight .. "   p init: " .. p)
+	--local p = math.floor(love.window.getHeight()/textureSize)/2
 	local v = 2
 	local a = -1
+
+	local highClamp = math.floor(p + (p/2))
+	local lowClamp = math.ceil(p - (p/2))
 
 	local container = initTable(width, height)
 
 	for x = 0, width - 1 do
-		--for y = 0, height -1 do
-		container[x][height-p] = 3
-		for y = height-p+1, height -1 do
-			if y < height-p+5 then
-				container[x][y] = 2
+		--container[x][height-p] = 3
+		container[x][p]["tile"] = 3
+
+--		for y = height-p+1, height -1 do
+		for y = p+1, height -1 do
+--			if y < height-p+5 then
+			if y < p+5 then
+					container[x][y]["tile"] = 2
+			elseif y > height - 4 then
+				container[x][y]["tile"] = 12
 			else
-				container[x][y] = getType()
+				container[x][y]["tile"] = getType()
 			end
 		end
-		p = p+v
---		local temp = modPosition(height, p, v, a)
---		p = temp[0]
---		v = temp[1]
---		a = temp[2]
 
+		p = p+v
 		if p > highClamp then 
 			p = highClamp 
 			v = 0
@@ -34,10 +48,12 @@ function mapgen(width, height)
 			v=0 
 			a = math.abs(a)
 		end
+
 		v = v+a
 		a = math.random(-2, 2)
 	end
 
+	print("highClamp: " .. highClamp .. "   lowClamp: " .. lowClamp .. "   xScale: " .. xScale)
 
 	--print(tostring(container))
 	return container
@@ -50,7 +66,10 @@ function initTable(width, height)
 	for x = 0, width - 1 do
 		container[x] = {}
 		for y = 0, height -1 do
-			container[x][y] = 0
+			--container[x][y] = 0
+			container[x][y] = {}
+			container[x][y]["tile"] = 0
+			container[x][y]["light"] = 255
 		end
 	end	
 	return container
@@ -78,9 +97,18 @@ end
 
 function mapdraw(ox,oy)
 
+
 	for x = 0, mapWidth-1 do
 		for y = 0, mapHeight-1 do
-			love.graphics.draw(tile[grid[x][y]],(x*textureSize) + ox, (y*textureSize) +  oy)
+			if (x >= mapX1 and x <= mapX2) and (y >= mapY1 and y <= mapY2) then
+				love.graphics.draw(tile[grid[x][y]["tile"]],(x*textureSize) + ox, (y*textureSize) +  oy)
+				local light = grid[x][y]["light"]
+				if light ~= 255 then
+					love.graphics.setColor( 0, 0, 0, light)
+					love.graphics.rectangle("fill", (x*textureSize) + ox, (y*textureSize) +  oy, textureSize, textureSize)
+					love.graphics.setColor( 255, 255, 255, 255)
+				end
+			end
 		end
 	end
 
@@ -97,4 +125,37 @@ function getType()
 	end
 
 	return ttype
+end
+
+function lightMap()
+	for x = 0, mapWidth-1 do
+		for y = 0, mapHeight-1 do
+			local airClose = false
+			local airFar = false
+			if grid[x][y]["tile"] ~= 0 then 
+				for xx = -2, 2 do
+					for yy = -2, 2 do
+						if (x+xx >= 0 and x+xx <= mapWidth-1) and (y+yy >= 0 and y+yy <= mapHeight -1) then
+							if grid[x+xx][y+yy]["tile"] == 0 then
+								if (xx == -2 or xx == 2) or (yy == -2 or yy == 2) then
+									airFar = true
+								else
+									airClose = true
+								end
+							end 
+						end
+					end
+				end
+				if airClose then 
+					grid[x][y]["light"] = 0 
+				elseif airFar then 
+					grid[x][y]["light"] = 128
+				else 
+					grid[x][y]["light"] = 212
+				end
+			end
+--			else grid[x][y]
+
+		end
+	end
 end

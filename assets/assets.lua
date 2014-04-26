@@ -23,3 +23,5 @@ tile[9] = love.graphics.newImage("assets/textures/log_oak.png")
 tile[10] = love.graphics.newImage("assets/textures/leaves_oak.png")
 --ice
 tile[11] = love.graphics.newImage("assets/textures/ice.png")
+--bedrock
+tile[12] = love.graphics.newImage("assets/textures/bedrock.png")
