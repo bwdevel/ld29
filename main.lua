@@ -7,6 +7,7 @@ function love.load()
 end
 
 function love.update(dt)
+	require("lib/lovebird").update()
 	statesUpdate(dt)
 
 end
