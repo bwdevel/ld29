@@ -25,8 +25,12 @@ function love.load()
 	mapX2 = love.window.getWidth()/textureSize
 	mapY1 = 0
 	mapY2 = love.window.getHeight()/textureSize
+	gravity = 5
+	lights = false
 
 	grid = mapgen(mapWidth, mapHeight)
+	lightMap()
+
 	love.graphics.setBackgroundColor( 0, 0, 0, 255 ) -- sky color
 	print("mapWidth: " .. mapWidth .. "    mapHeight:  " .. mapHeight .. "    mapOffsetX (cap): " .. (mapWidth * textureSize) - love.window.getWidth())
 end
@@ -55,7 +59,8 @@ function love.update(dt)
 	mapY1 = -math.floor(mapOffsetY/textureSize)-1
 	mapY2 = mapY1 + love.window.getHeight()/textureSize
 
-	playerUpdate()
+	playerUpdate(dt)
+
 end
 
 function love.draw()
@@ -95,28 +100,39 @@ function love.keypressed(key)
 
 	statesKeyPressed(key)
 
-	if key == 'a' or key == 'left' then scrollRight = true end
-	if key == 'd' or key == 'right' then scrollLeft = true end
+	if key == 'a' or key == 'left' then scrollLeft = true end
+	if key == 'd' or key == 'right' then scrollRight = true end
 	if key == 'w' or key == 'up' then scrollDown = true end
 	if key == 's' or key == 'down' then scrollUp = true end
+
+	if key == ' ' then playerJump() end
 
 end
 
 function love.keyreleased(key)
 
 	statesKeyReleased(key)
+
 	if key == 'q' then love.event.quit() end
-	if key == ' ' then 
+	if key == 'r' then 
 		grid = mapgen(mapWidth, mapHeight) 
+		lightMap()
 		findGround() 
 	end
 
-	if key == 'a' or key == 'left' then scrollRight = false end
-	if key == 'd' or key == 'right' then scrollLeft = false end
+	--if key == ' ' then playerJump() end
+
+	if key == 'a' or key == 'left' then scrollLeft = false end
+	if key == 'd' or key == 'right' then scrollRight = false end
 	if key == 'w' or key == 'up' then scrollDown = false end
 	if key == 's' or key == 'down' then scrollUp = false end
-	if key == 'l' then lightMap() end
-
+	if key == 'l' then 
+		if lights == true then 
+			lights = false
+		else 
+			lights = true
+		end
+	end
 
 end
 

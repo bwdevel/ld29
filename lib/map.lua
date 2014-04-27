@@ -5,14 +5,10 @@ function mapgen(width, height)
 	vheight = math.floor(love.window.getHeight()/textureSize)
 
 	local xScale = (height*textureSize)/love.window.getHeight()
---	local highClamp = height - math.floor(height/3)
-		--local lowClamp = math.floor(height/3)
---	local lowClamp = highClamp - 10
-	--local p = height - (math.floor(love.window.getHeight()/xScale)/height)
 	local p = math.floor(vheight/2) --- make this dynamic
 
 	print("height: " .. height .. "  vheight: " .. vheight .. "   p init: " .. p)
-	--local p = math.floor(love.window.getHeight()/textureSize)/2
+
 	local v = 2
 	local a = -1
 
@@ -75,10 +71,10 @@ function initTable(width, height)
 	for x = 0, width - 1 do
 		container[x] = {}
 		for y = 0, height -1 do
-			--container[x][y] = 0
 			container[x][y] = {}
 			container[x][y]["tile"] = 0
-			container[x][y]["light"] = 255
+			container[x][y]["light"] = 0
+			container[x][y]["highlight"] = false
 		end
 	end	
 	return container
@@ -113,33 +109,18 @@ function mapdraw(ox,oy)
 		for y = 0, mapHeight-1 do
 			if (x >= mapX1 and x <= mapX2) and (y >= mapY1 and y <= mapY2) then
 				love.graphics.draw(tile[grid[x][y]["tile"]],(x*textureSize) + ox, (y*textureSize) +  oy)
-				local light = grid[x][y]["light"]
-				if light ~= 255 then
-					love.graphics.setColor( 0, 0, 0, light)
-					love.graphics.rectangle("fill", (x*textureSize) + ox, (y*textureSize) +  oy, textureSize, textureSize)
-					love.graphics.setColor( 255, 255, 255, 255)
+
+				if lights == true then
+					local light = grid[x][y]["light"]
+					if light ~= 0 then
+						love.graphics.setColor( 0, 0, 0, light)
+						love.graphics.rectangle("fill", (x*textureSize) + ox, (y*textureSize) +  oy, textureSize, textureSize)
+						love.graphics.setColor( 255, 255, 255, 255)
+					end
 				end
 			end
 		end
 	end
-
---	for x = 0 - tempX , mapWidth - 1 - tempX do
---		local xx = x
---		if xx >= mapWidth then xx = xx - mapWidth end
---		if xx < 0 then xx = xx + mapWidth end
-
---		for y = 0 - tempY, mapHeight - 1 - tempY do
---			local yy = y
---			if yy >= mapHeight then yy = yy - mapHeight end
---			if yy < 0 then yy = yy + mapHeight end
-
---			love.graphics.draw(tile[grid[xx][yy]["tile"]],(xx*textureSize) + ox, (yy*textureSize) +  oy)
---				local light = grid[x][y]["light"]
---				if light ~= 255 then
---					love.graphics.setColor( 0, 0, 0, light)
---					love.graphics.rectangle("fill", (x*textureSize) + ox, (y*textureSize) +  oy, textureSize, textureSize)
---					love.graphics.setColor( 255, 255, 255, 255)
---				end
 
 	local text = "tempX: " .. tempX .. "    tempY: " .. tempY
 	love.graphics.print(text, 10, 46)
@@ -179,17 +160,6 @@ function getType(depth)
 		end
 
 	end
---	local ttype = 1
-
-
-
---	local rand = math.random(1, 1000)
---	if rand == 5 then ttype =  7
---	elseif rand > 5 and rand <= 20 then ttype = 7
---	elseif rand > 20 and rand <=65 then ttype = 6
---	elseif rand > 65 and rand <=95 then ttype = 5
---	elseif rand > 95 and rand <= 150 then ttype = 4
---end
 
 	return ttype
 end
@@ -216,13 +186,11 @@ function lightMap()
 				if airClose then 
 					grid[x][y]["light"] = 0 
 				elseif airFar then 
-					grid[x][y]["light"] = 128
+					grid[x][y]["light"] = 128  -- 128
 				else 
-					grid[x][y]["light"] = 212
+					grid[x][y]["light"] = 255 -- 212
 				end
 			end
---			else grid[x][y]
-
 		end
 	end
 end
